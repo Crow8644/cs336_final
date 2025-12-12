@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PinsService } from './services/pins.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -12,5 +14,13 @@ import { RouterOutlet } from '@angular/router';
   styles: [],
 })
 export class AppComponent {
+  service = inject(PinsService);
+
   title = 'timelinemap';
+  constructor() {
+
+    console.log(this.service.map_url$);
+
+    
+  }
 }

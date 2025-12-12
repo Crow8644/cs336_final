@@ -1,10 +1,4 @@
 {
-  "firestore": {
-    "database": "(default)",
-    "location": "us-east4",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
   "hosting": {
     "public": "dist/timelinemap/browser",
     "ignore": [
@@ -12,5 +6,11 @@
       "**/.*",
       "**/node_modules/**"
     ]
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }
