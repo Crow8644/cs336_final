@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { PinsService } from './services/pins.service';
+import { AsyncPipe } from '@angular/common';
 import { LocationDetailComponent } from './components/location-detail/location-detail.component';
 import { LocationListComponent } from './components/location-list/location-list.component';
 import { TimelineComponent } from './components/timeline/timeline.component';
@@ -15,5 +17,13 @@ import { TimelineComponent } from './components/timeline/timeline.component';
   styles: [],
 })
 export class AppComponent {
+  service = inject(PinsService);
+
   title = 'timelinemap';
+  constructor() {
+
+    console.log(this.service.map_url$);
+
+    
+  }
 }
