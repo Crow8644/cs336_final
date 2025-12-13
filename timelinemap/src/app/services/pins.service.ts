@@ -1,6 +1,11 @@
-import { computed, inject, Injectable } from '@angular/core';
-import { addDoc, collection, collectionData, docData, Firestore, getDocs, orderBy, query, Timestamp } from '@angular/fire/firestore';
+import { computed, inject, Injectable, signal, Signal } from '@angular/core';
+import { addDoc, collection, collectionData, doc, docData, documentId, Firestore, getDocs, orderBy, query, Timestamp, where } from '@angular/fire/firestore';
+import { DomSanitizer } from '@angular/platform-browser';
 import { async, map, Observable } from 'rxjs';
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { deleteDoc } from '@firebase/firestore';
+
+const default_icon = "default";
 
 interface Pin {
   // Even in a real pin, these can be undefined, meaning there was no start or no end time
@@ -13,30 +18,42 @@ interface Pin {
   description: string,
 }
 
-interface MapEntry {
-  map: string,
-  pins: Pin[],
+const default_pin: Pin = {
+  x: 20,
+  y: 20,
+  name: "blank",
+  icon: default_icon,
+  description: "",
 }
+
 @Injectable({
   providedIn: 'root'
 })
 export class PinsService {
   firestore: Firestore = inject(Firestore);
+  sani = inject(DomSanitizer);
+  storage = getStorage();
 
-  public pins$: Observable<Pin[]> = new Observable();
-  public map_url$: Observable<MapEntry[]> = new Observable();
+  // public pins$: Observable<Pin[]> = new Observable();
+  // public map_url$: Observable<MapEntry[]> = new Observable();
+
+  public pins = signal<Pin[]>([]);
+  private map_url = signal<string>("");
+
+  public safe_map_url = computed(() => this.sani.bypassSecurityTrustResourceUrl(encodeURI(this.map_url())))
   
   constructor() { 
     this.load_map("default-map")
   }
 
   public async load_map(map_name: string) {
+    let map_id = "";
     const map_collection = collection(this.firestore, 'mapping-application');
 
-    const q = query(map_collection);
-    const data = collectionData<Partial<MapEntry>>(q);
+    // Also this: https://javascript.plainenglish.io/querying-firestore-for-documents-with-an-array-of-ids-c76d3081c5ef
+    const q = query(map_collection, where(documentId(), "==", map_name));
 
-    // Note: https://www.youtube.com/watch?v=zX_d2jat8ng
+    // Helpful tutorial: https://www.youtube.com/watch?v=zX_d2jat8ng
     const records = await getDocs(q);
     const testData = records.docs.map(record => {
       const x = record.data();
@@ -46,46 +63,52 @@ export class PinsService {
         }
     })
 
-    console.log(testData)
+    console.log(testData);
 
-    // this.map_url$ = data.pipe(map(val => {  // Confusingly, this map gets the whole list
-    //   return val.map(record => { // The function here recieve each incoming record
-    //     return {  // Converting record to full FirestoreRec
-    //       map: record.map || "",
-    //       pins: record.pins || [],
-    //     }
-    //   })
-    // }));
+    map_id = testData[0].map;
+    this.pins.set(testData[0].pins);
 
-    // const thisDoc = doc(this.firestore, 'mapping_application/' + encodeURIComponent(map_name))
-    // const thisDocData = docData(thisDoc);
+    // A post that helped me figure out what to do here: https://stackoverflow.com/questions/76571331/using-async-await-in-angular-computed-signal
+    this.map_url.set( await getDownloadURL(ref(this.storage, encodeURI(map_id))) )
+  }
 
-    // console.log(thisDocData);
+  // Good site: https://www.bezkoder.com/angular-17-firestore-crud/
 
-    // this.map_url$ = thisDocData.pipe(map(val => {
-    //   return (val) ? val['map'] || '' : '';
-    // }))    
+  public addPin(map_name: string, pin: Partial<Pin>) {
+    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(map_name) + 'pins'));
 
-    // The encoding prevents injection attacks
-    // const map_ref = doc(this.firestore, 'mapping_application/' + encodeURIComponent(map_name));
+    addDoc(collection_ref, {
+      x: pin.x ?? 20,
+      y: pin.y ?? 20,
+      icon: pin.icon ?? default_icon,
+      name: pin.name ?? "blank",
+      description: pin.description ?? "",
+      
+      startTime: pin.startTime,
+      endTime: pin.endTime,
+    })
+  }
 
-    // const pin_collection = collection(map_ref, "pins");
+  public deletePin(map_name: string, pinID: string) {
+    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(map_name) + 'pins'));
 
-    // const q = query(pin_collection); // Note: If we want to order it a certain way, add that here
-    // const data = collectionData<Partial<Pin>>(q);
+    const pin_ref = doc(collection_ref, pinID); // Selector for the specific pin with that the passed id
+
+    deleteDoc(pin_ref);
+  }
+
+  //TODO, determine type of file
+  public async makeMap(file: any, filename: string, mapName: string) {
+    const storage_ref = ref(this.storage, filename);
+
+    await uploadBytes(storage_ref, file);
+
+    const map_collection = collection(this.firestore, 'mapping-application');
+
+    const doc_ref = await addDoc(map_collection, {map: filename});
     
-    // // Here we use pipe to change one oberserval to another with default values
-    // this.pins$ = data.pipe(map(val => {  // Confusingly, this map gets the whole list
-    //   return val.map(record => { // The function here recieve each incoming record
-    //     return {  // Converting record to full FirestoreRec
-    //       x: record.x ?? 0,
-    //       y: record. y ?? 0,
-    //       icon: record.icon ?? "defaultIconURI",
-    //       name: record.name ?? "default",
-    //       description: record.description ?? "",
-    //       ... record
-    //     }
-    //   })
-    // }));
+    const pins_ref = collection(doc_ref, 'pins');
+
+    addDoc(pins_ref, default_pin);
   }
 }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { LocationDetailComponent } from '../location-detail/location-detail.component';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { PinsService } from '../../services/pins.service';
 
 @Component({
   selector: 'app-location-list',
@@ -18,10 +19,10 @@ import {MatExpansionModule} from '@angular/material/expansion';
         </mat-accordion>
 
         <!-- CONNECT SERVICE HERE for list of locations -->
-        <!--@for (loction of locations(); track $index){
-
+        @for (loction of service.pins(); track $index){
+          
         }
-        -->
+        
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -33,5 +34,5 @@ import {MatExpansionModule} from '@angular/material/expansion';
   `
 })
 export class LocationListComponent {
-
+  service = inject(PinsService);
 }
