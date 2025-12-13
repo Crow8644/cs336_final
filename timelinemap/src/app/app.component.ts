@@ -6,11 +6,12 @@ import { LocationDetailComponent } from './components/location-detail/location-d
 import { LocationListComponent } from './components/location-list/location-list.component';
 import { TimelineComponent } from './components/timeline/timeline.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { MatIcon } from '@angular/material/icon';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LocationDetailComponent, LocationListComponent, TimelineComponent],
+  imports: [RouterOutlet, LocationDetailComponent, LocationListComponent, TimelineComponent, MatIcon],
   template: `
     <app-timeline></app-timeline>
     <span id="map-container">

@@ -18,10 +18,12 @@ import { PinsService } from '../../services/pins.service';
           <app-location-detail></app-location-detail>
         </mat-accordion>
 
-        <!-- CONNECT SERVICE HERE for list of locations -->
-        @for (loction of service.pins(); track $index){
-          
-        }
+        <mat-accordion>
+          <!-- CONNECT SERVICE HERE for list of locations -->
+          @for (loction of service.pins(); track $index){
+            <app-location-detail></app-location-detail>
+          }
+        </mat-accordion>
         
       </mat-sidenav-content>
   

@@ -5,9 +5,9 @@ import { async, map, Observable } from 'rxjs';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { deleteDoc } from '@firebase/firestore';
 
-const default_icon = "default";
+const default_icon = "Flag";
 
-interface Pin {
+export interface Pin {
   // Even in a real pin, these can be undefined, meaning there was no start or no end time
   startTime?: number,
   endTime?: number,
