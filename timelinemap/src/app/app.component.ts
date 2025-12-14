@@ -41,6 +41,6 @@ export class AppComponent {
 
   title = 'timelinemap';
   constructor() {
-    console.log(this.service.pins())
+    
   }
 }
