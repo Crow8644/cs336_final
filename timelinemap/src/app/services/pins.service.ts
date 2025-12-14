@@ -3,7 +3,8 @@ import { addDoc, collection, collectionData, doc, docData, documentId, Firestore
 import { DomSanitizer } from '@angular/platform-browser';
 import { async, map, Observable } from 'rxjs';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { deleteDoc } from '@firebase/firestore';
+import { deleteDoc, setDoc } from '@firebase/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 const default_icon = "Flag";
 
@@ -55,18 +56,33 @@ export class PinsService {
 
     // Helpful tutorial: https://www.youtube.com/watch?v=zX_d2jat8ng
     const records = await getDocs(q);
-    const testData = records.docs.map(record => {
+    const mapData = records.docs.map(record => {
       const x = record.data();
       return {  // Converting record to full FirestoreRec
           map: x['map'] || "",
-          pins: x['pins'] || [],
+          pins: collection(this.firestore, record.ref.path, 'pins'),
         }
     })
 
-    console.log(testData);
+    console.log(mapData);
 
-    map_id = testData[0].map;
-    this.pins.set(testData[0].pins);
+    map_id = mapData[0].map;
+    const q2 = query(mapData[0].pins)
+    const pin_data = collectionData<Partial<Pin>>(q2)
+    
+    // Turns and an observable into a signal for outside use
+    pin_data.subscribe(data => this.pins.set(data.map(record => {
+      return {
+          x: record.x ?? 20,
+          y: record.y ?? 20,
+          icon: record.icon ?? default_icon,
+          name: record.name ?? "blank",
+          description: record.description ?? "",
+          
+          startTime: record.startTime,
+          endTime: record.endTime,
+        }})
+    ))
 
     // A post that helped me figure out what to do here: https://stackoverflow.com/questions/76571331/using-async-await-in-angular-computed-signal
     this.map_url.set( await getDownloadURL(ref(this.storage, encodeURI(map_id))) )
@@ -99,16 +115,16 @@ export class PinsService {
 
   //TODO, determine type of file
   public async makeMap(file: any, filename: string, mapName: string) {
+    // Adding the image to the storage
     const storage_ref = ref(this.storage, filename);
-
     await uploadBytes(storage_ref, file);
 
-    const map_collection = collection(this.firestore, 'mapping-application');
-
-    const doc_ref = await addDoc(map_collection, {map: filename});
+    // Creating the general doc. Using setDoc instead of addDoc so we can chose the id
+    const mapping_doc = doc(this.firestore, 'mapping-application', encodeURIComponent(mapName));
+    await setDoc(mapping_doc, {map: filename});
     
-    const pins_ref = collection(doc_ref, 'pins');
-
+    // Adding the pin
+    const pins_ref = collection(mapping_doc, 'pins');
     addDoc(pins_ref, default_pin);
   }
 }

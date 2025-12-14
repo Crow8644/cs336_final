@@ -1,27 +1,43 @@
 import { Component, input } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { Pin } from '../../services/pins.service'
+import { MatIcon } from '@angular/material/icon';
 
 
 @Component({
   selector: 'app-pin',
-  imports: [],
+  imports: [MatIcon],
   template: `
-    <div id="container">
-      <p>{{data.name}}</p>
-      <mat-icon class="material-symbols-outlined icon">Flag</mat-icon>
-      <mat-icon class="material-symbols-outlined pointer">Keyboard Arrow Down</mat-icon>
-    </div>
+    <span id="container">
+      <p class="name-display">{{data().name}}</p>
+      <mat-icon class="material-symbols-outlined icon">{{data().icon}}</mat-icon>
+      <br/>
+      <mat-icon class="material-symbols-outlined pointer">keyboard_arrow_down</mat-icon>
+    </span>
   `,
   styles: `
+    .name-display {
+      visibility: hidden;
+      margin-left: 0.2rem;
+      margin-bottom: 0.2rem;
+      font-style: italic;
+      width: 5rem;
+    }
+    #container:hover .name-display {
+      visibility: visible;
+    }
     #container {
-      display: relative;
-      
+      display: inline;
+      flex-direction: horizontal;
+      align-content: center;
     }
   `
 })
 export class PinComponent {
   public data = input.required<Pin>();
+  constructor() {
+    this.data
+  }
 }
 
 /* Icons from Material Desing that work for this:

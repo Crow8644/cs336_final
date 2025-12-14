@@ -13,15 +13,9 @@ import { PinsService } from '../../services/pins.service';
       <mat-sidenav-content>
       <!-- Example list for testing -->
         <mat-accordion>
-          <app-location-detail></app-location-detail>
-          <app-location-detail></app-location-detail>
-          <app-location-detail></app-location-detail>
-        </mat-accordion>
-
-        <mat-accordion>
           <!-- CONNECT SERVICE HERE for list of locations -->
-          @for (loction of service.pins(); track $index){
-            <app-location-detail></app-location-detail>
+          @for (location of service.pins(); track $index){
+            <app-location-detail [data]="location"></app-location-detail>
           }
         </mat-accordion>
         
