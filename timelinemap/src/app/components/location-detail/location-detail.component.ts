@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 //import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
+import { Pin } from '../../services/pins.service';
 import { LocationEditingComponent } from '../location-editing/location-editing.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -34,7 +35,7 @@ interface editForm {
               }
 
               @else{
-                <p> Location Name </p> <!-- CONNECT SERVICE HERE --> 
+                {{data().name}}
                 }
           </mat-panel-title>
 
@@ -52,7 +53,7 @@ interface editForm {
 
       @else{ 
         <p>start date - end date</p> <!-- CONNECT SERVICE HERE -->
-        <p>description</p> <!-- CONNECT SERVICE HERE -->
+        <p>{{data().description}}</p> <!-- CONNECT SERVICE HERE -->
         }
     </mat-expansion-panel>
     
@@ -62,6 +63,7 @@ interface editForm {
 export class LocationDetailComponent {
   editing: boolean = false;
   submitted: boolean = false;
+  public data = input.required<Pin>();
   editingForm = new FormGroup(
     {
       locationName: new FormControl(), //'', Validators.required

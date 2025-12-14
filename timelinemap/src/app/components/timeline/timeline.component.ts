@@ -9,7 +9,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
   selector: 'app-timeline',
   imports: [MatToolbarModule, MatSliderModule, MatButtonModule, MatIconModule, LocationListComponent],
   template: `
-  <mat-toolbar>
+  <mat-toolbar class="header">
 
     <button matIconButton id = "showLocList" (click) = "showLocList()">
       <mat-icon>menu</mat-icon>
@@ -30,6 +30,11 @@ import { LocationListComponent } from '../location-list/location-list.component'
 
     mat-slider {
       
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
     }
   `
 })
