@@ -17,8 +17,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     <h1 class = "title"> Map Maker </h1>
 
     <mat-slider discrete min = "0" max = "1000">  <!-- CONNECT TO SERVICE LATER (min and max) -->
-      <input matSliderStartThumb>
-      <input matSliderEndThumb>
+      <input matSliderThumb> <!-- Style so slider is just a point instead of a line -->
     </mat-slider>
   </mat-toolbar>
 
