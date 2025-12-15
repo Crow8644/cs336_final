@@ -3,12 +3,13 @@ import { addDoc, collection, collectionData, doc, docData, documentId, Firestore
 import { DomSanitizer } from '@angular/platform-browser';
 import { async, map, Observable } from 'rxjs';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { deleteDoc, setDoc } from '@firebase/firestore';
+import { deleteDoc, setDoc, updateDoc } from '@firebase/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 const default_icon = "Flag";
 
 export interface Pin {
+  id: string,
   // Even in a real pin, these can be undefined, meaning there was no start or no end time
   startTime?: number,
   endTime?: number,
@@ -25,6 +26,7 @@ const default_pin: Pin = {
   name: "blank",
   icon: default_icon,
   description: "",
+  id: "",
 }
 
 @Injectable({
@@ -68,7 +70,7 @@ export class PinsService {
 
     map_image_id = mapData[0].map;
     const q2 = query(mapData[0].pins)
-    const pin_data = collectionData<Partial<Pin>>(q2)
+    const pin_data = collectionData<Partial<Pin>>(q2, {idField: 'id'})
     
     // Turns and an observable into a signal for outside use
     pin_data.subscribe(data => this.pins.set(data.map(record => {
@@ -78,6 +80,7 @@ export class PinsService {
           icon: record.icon ?? default_icon,
           name: record.name ?? "blank",
           description: record.description ?? "",
+          id: record.id || "",
           
           startTime: record.startTime,
           endTime: record.endTime,
@@ -101,9 +104,15 @@ export class PinsService {
       description: pin.description ?? "",
       
       // Interesting note, Firebase does not support undefined
-      // startTime: pin.startTime,
-      // endTime: pin.endTime,
+      startTime: pin.startTime ?? 0,
+      endTime: pin.endTime ?? Number.MAX_VALUE,
     })
+  }
+
+  public async updatePin(pin: Partial<Pin>) {
+    const doc_ref = doc(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins/' + encodeURIComponent(pin.id ?? "")));
+
+    await updateDoc(doc_ref, pin);
   }
 
   public deletePin(pinID: string) {
