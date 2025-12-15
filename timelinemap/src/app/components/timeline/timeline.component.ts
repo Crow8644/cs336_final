@@ -22,7 +22,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     </mat-slider>
   </mat-toolbar>
 
-  <app-location-list  #locationList [sliderValue]="this.sliderValue"> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
+  <app-location-list [(openPanel)]="openPin" [sliderValue]="this.sliderValue" #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
   `,
   styles: `
     .title {
@@ -41,6 +41,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
   `
 })
 export class TimelineComponent {
+  public openPin = signal(-1); // Set to negative 1 so everything is closed by default
   @ViewChild('locationList') locationList!: LocationListComponent;
   sliderValue = signal(0);
 

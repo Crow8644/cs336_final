@@ -1,4 +1,4 @@
-import { Component, inject, signal, Input, computed } from '@angular/core';
+import { Component, inject, model, output, signal, Input } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { PinComponent } from '../pin/pin.component';
 import { ZoomComponent } from '../zoom/zoom.component';
@@ -17,7 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
       <!-- These pins are positioned relative to their original position under the map -->
       @for (location of filteredPins(); track $index){
         <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
-          <app-pin [data]="location" class="pin"></app-pin>
+          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor" (openned)="openUp($index)"></app-pin>
         </div>
       }
       <span id="zoom-containter">
@@ -43,7 +43,6 @@ import { MatButtonModule } from '@angular/material/button';
     }
     .pin-container {
       position: absolute;
-      height: 0;
       width: 10rem;
       z-index: 0;
     }
@@ -62,6 +61,8 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class MapViewComponent {
   service = inject(PinsService);
+  openPin = model(-1);
+  onAddPin = output<string>();
 
   //For recieving the sliderFilter value, chatGPT suggested making the sliderValue a signal
   @Input() sliderValue = signal(0);
@@ -81,6 +82,10 @@ export class MapViewComponent {
       pin.startTime! <= this.sliderValue() && pin.endTime! >= this.sliderValue()
     )
   );
+  public openUp(index: number) {
+    if (this.openPin() === index) this.openPin.set(-1); // This setting makes it so we can open the same pin multiple names in a row
+    this.openPin.set(index);
+  }
 
   toggleCheck() {
     this.creating = !this.creating;
@@ -88,17 +93,19 @@ export class MapViewComponent {
 
   makePin(event: MouseEvent) {
     if (this.creating) {
+      // Documentation for this: https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
+      // Post where I found out about it: https://stackoverflow.com/questions/36532307/rem-px-in-javascript
       const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
 
-      const x = ((event.pageX / px_per_rem) * 10) / this.zoomFactor();
-      const y = ((event.pageY / px_per_rem) * 10) / this.zoomFactor();
+      const x = ((event.pageX / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
+      const y = ((event.pageY / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
 
       // TODO: Let the user set the data
       this.service.addPin({
         x,
         y,
         name: "testAddPin",
-      })
+      }).then((ref) => this.onAddPin.emit(ref.id));
 
       this.creating = false;
     }
@@ -109,11 +116,11 @@ export class MapViewComponent {
 
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    return (y / 10) * this.zoomFactor();
+    return ((y / 10) - 0.006) * this.zoomFactor() * this.initialHeight;
   }
 
   translate_x(x: number) {
-    return (x / 10) * this.zoomFactor();
+    return (((x / 10) - 0.00005) * this.zoomFactor() * this.initialHeight) - 0.8;
   }
   
 }
