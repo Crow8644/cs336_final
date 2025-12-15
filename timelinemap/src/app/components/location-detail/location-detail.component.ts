@@ -1,4 +1,4 @@
-import { Component, input, inject  } from '@angular/core';
+import { Component, input, inject, computed  } from '@angular/core';
 //import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { PinsService, Pin } from '../../services/pins.service';
@@ -7,6 +7,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { ReactiveFormsModule, Validators, FormGroup, FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import {TextFieldModule} from '@angular/cdk/text-field';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /*TODO:
 -Connect service
@@ -29,7 +30,7 @@ interface editForm {
 <!-- I orginally had the entire expansion pannel in the @if and @else, but that was causing issues, ChatGPT suggested only putting the form parts in @if and @else
 <!-- The form for editing the location -->
 
-  <mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel [expanded]="open()">
         <mat-expansion-panel-header>
           <mat-panel-title>
                 {{data().name}}    
@@ -76,6 +77,15 @@ interface editForm {
 })
 export class LocationDetailComponent {
   service = inject(PinsService);
+  open = input(false);
+  // toEdit = input(false);
+
+  // private editObs = toObservable(this.toEdit);
+
+  // constructor() {
+  //   this.editObs.subscribe(() => this.edit());
+  // }
+
   editing: boolean = false;
   submitted: boolean = false;
   public data = input.required<Pin>();
@@ -108,7 +118,7 @@ export class LocationDetailComponent {
 
   }
 
-    onSubmit() {
+  onSubmit() {
     this.submitted = true;
     this.editing = false;
     // I did a bad thing and added "!" to bypass undefined posibility, if time will fix

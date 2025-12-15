@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatButtonModule} from '@angular/material/button';
@@ -21,7 +21,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     </mat-slider>
   </mat-toolbar>
 
-  <app-location-list  #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
+  <app-location-list [(openPanel)]="openPin" #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
   `,
   styles: `
     .title {
@@ -40,6 +40,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
   `
 })
 export class TimelineComponent {
+  public openPin = signal(-1); // Set to negative 1 so everything is closed by default
   @ViewChild('locationList') locationList!: LocationListComponent;
 
 
