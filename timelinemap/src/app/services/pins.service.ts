@@ -18,11 +18,13 @@ export interface Pin {
   icon: string,
   name: string,
   description: string,
+
+  timestamp?: Timestamp,
 }
 
 const default_pin: Pin = {
-  x: 20,
-  y: 20,
+  x: 0.5,
+  y: 0.5,
   name: "blank",
   icon: default_icon,
   description: "",
@@ -69,14 +71,16 @@ export class PinsService {
     })
 
     map_image_id = mapData[0].map;
-    const q2 = query(mapData[0].pins)
+
+    // The timestamp field in the database is used to order records by creation time, but is not included in the Pin data itself
+    const q2 = query(mapData[0].pins, orderBy('timestamp'))
     const pin_data = collectionData<Partial<Pin>>(q2, {idField: 'id'})
     
     // Turns and an observable into a signal for outside use
     pin_data.subscribe(data => this.pins.set(data.map(record => {
       return {
-          x: record.x ?? 20,
-          y: record.y ?? 20,
+          x: record.x ?? 0.5,
+          y: record.y ?? 0.5,
           icon: record.icon ?? default_icon,
           name: record.name ?? "blank",
           description: record.description ?? "",
@@ -84,6 +88,7 @@ export class PinsService {
           
           startTime: record.startTime,
           endTime: record.endTime,
+          timestamp: record.timestamp,
         }})
     ))
 
@@ -97,11 +102,12 @@ export class PinsService {
     const collection_ref = collection(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins'));
 
     const ref = await addDoc(collection_ref, {
-      x: pin.x ?? 20,
-      y: pin.y ?? 20,
+      x: pin.x ?? 0.5,
+      y: pin.y ?? 0.5,
       icon: pin.icon ?? default_icon,
       name: pin.name ?? "blank",
       description: pin.description ?? "",
+      timestamp: Timestamp.now(),
       
       // Interesting note, Firebase does not support undefined
       startTime: pin.startTime ?? 0,
@@ -113,6 +119,7 @@ export class PinsService {
 
   public async updatePin(pin: Partial<Pin>) {
     const doc_ref = doc(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins/' + encodeURIComponent(pin.id ?? "")));
+    delete pin.id; // A built-in js feature to remove a field from an object
 
     await updateDoc(doc_ref, pin);
   }

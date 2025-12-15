@@ -2,7 +2,7 @@ import { Component, computed, inject, input, model, signal, ViewChild } from '@a
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { LocationDetailComponent } from '../location-detail/location-detail.component';
 import {MatExpansionModule} from '@angular/material/expansion';
-import { PinsService } from '../../services/pins.service';
+import { Pin, PinsService } from '../../services/pins.service';
 import { MapViewComponent } from '../map-view/map-view.component';
 import { toObservable } from '@angular/core/rxjs-interop';
 
@@ -21,7 +21,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
         </mat-accordion>
       </mat-sidenav>
       <mat-sidenav-content>
-        <app-map-view [(openPin)]="openPanel"></app-map-view>
+        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)"></app-map-view>
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -54,11 +54,11 @@ export class LocationListComponent {
 
   constructor() {
     this.openPanel.subscribe(() => this.sidenav.open());
-    toObservable(this.service.pins).subscribe(() => {
-      this.openPanel.set(this.service.pins.length - 1);
-      //TODO: Set child into editting mode
-      //TODO: Let pins be ordered by time added
-    })
+  }
+
+  pinAdded(id: string) {
+    this.openPanel.set(this.service.pins().findIndex((value: Pin) => value.id === id))
+    // TODO: Make child editable
   }
 
   toggle() {

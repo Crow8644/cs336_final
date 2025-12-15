@@ -1,4 +1,4 @@
-import { Component, inject, model, signal } from '@angular/core';
+import { Component, inject, model, output, signal } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { PinComponent } from '../pin/pin.component';
 import { ZoomComponent } from '../zoom/zoom.component';
@@ -62,6 +62,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class MapViewComponent {
   service = inject(PinsService);
   openPin = model(-1);
+  onAddPin = output<string>();
 
   public initialHeight = window.innerHeight;
   public zoomFactor = signal(1); // Making zoom factor a signal and passing it to the zoom component as a model lets the zoom component change it.
@@ -95,7 +96,7 @@ export class MapViewComponent {
         x,
         y,
         name: "testAddPin",
-      })
+      }).then((ref) => this.onAddPin.emit(ref.id));
 
       this.creating = false;
     }
