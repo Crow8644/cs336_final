@@ -80,8 +80,8 @@ export class MapViewComponent {
     if (this.creating) {
       const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
 
-      const x = ((event.pageX / px_per_rem) * 10) / this.zoomFactor();
-      const y = ((event.pageY / px_per_rem) * 10) / this.zoomFactor();
+      const x = ((event.pageX / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
+      const y = ((event.pageY / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
 
       // TODO: Let the user set the data
       this.service.addPin({
@@ -99,10 +99,10 @@ export class MapViewComponent {
 
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    return (y / 10) * this.zoomFactor();
+    return ((y / 10) * this.zoomFactor() * this.initialHeight) - 5;
   }
 
   translate_x(x: number) {
-    return (x / 10) * this.zoomFactor();
+    return ((x / 10) * this.zoomFactor() * this.initialHeight) - 0.8;
   }
 }
