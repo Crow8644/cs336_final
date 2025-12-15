@@ -17,7 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
       <!-- These pins are positioned relative to their original position under the map -->
       @for (location of service.pins(); track $index){
         <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
-          <app-pin [data]="location" class="pin"></app-pin>
+          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor"></app-pin>
         </div>
       }
       <span id="zoom-containter">
@@ -43,7 +43,6 @@ import { MatButtonModule } from '@angular/material/button';
     }
     .pin-container {
       position: absolute;
-      height: 0;
       width: 10rem;
       z-index: 0;
     }
@@ -78,6 +77,8 @@ export class MapViewComponent {
 
   makePin(event: MouseEvent) {
     if (this.creating) {
+      // Documentation for this: https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
+      // Post where I found out about it: https://stackoverflow.com/questions/36532307/rem-px-in-javascript
       const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
 
       const x = ((event.pageX / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
@@ -99,10 +100,10 @@ export class MapViewComponent {
 
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    return ((y / 10) * this.zoomFactor() * this.initialHeight) - 5;
+    return ((y / 10) - 0.006) * this.zoomFactor() * this.initialHeight;
   }
 
   translate_x(x: number) {
-    return ((x / 10) * this.zoomFactor() * this.initialHeight) - 0.8;
+    return (((x / 10) - 0.00005) * this.zoomFactor() * this.initialHeight) - 0.8;
   }
 }
