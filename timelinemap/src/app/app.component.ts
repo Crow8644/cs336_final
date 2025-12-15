@@ -21,19 +21,6 @@ import { MapViewComponent } from './components/map-view/map-view.component';
     <router-outlet />
   `,
   styles: [`
-    #map-image {
-      position: relative;
-      
-    }
-    #map-container {
-      display: inline-block;
-      overflow: scroll;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      right: 0;
-      z-index: -1;
-    }
   `],
 })
 export class AppComponent {
@@ -41,6 +28,6 @@ export class AppComponent {
 
   title = 'timelinemap';
   constructor() {
-    console.log(this.service.pins())
+
   }
 }

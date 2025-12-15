@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
   imports: [MatIcon],
   template: `
     <span id="container">
-      <p class="name-display">{{data().name}}</p>
+      <p class="name-display">{{data().id}}</p>
       <mat-icon class="material-symbols-outlined icon">{{data().icon}}</mat-icon>
       <br/>
       <mat-icon class="material-symbols-outlined pointer">keyboard_arrow_down</mat-icon>
