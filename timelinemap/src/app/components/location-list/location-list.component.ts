@@ -16,7 +16,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
         <mat-accordion>
           <!-- CONNECT SERVICE HERE for list of locations -->
           @for (location of service.pins(); track $index){
-            <app-location-detail [data]="location" [open]="openPanel() === $index"></app-location-detail>
+            <app-location-detail [data]="location" 
+            [open]="openPanel() === $index"
+          ></app-location-detail>
           }
         </mat-accordion>
       </mat-sidenav>
@@ -52,13 +54,16 @@ export class LocationListComponent {
      @ViewChild('sidenav') sidenav!: MatSidenav;
   openPanel = model(-1); // Set to negative 1 so everything is closed by default
 
+  editPanel = signal(-1);
+
   constructor() {
     this.openPanel.subscribe(() => this.sidenav.open());
   }
 
   pinAdded(id: string) {
-    this.openPanel.set(this.service.pins().findIndex((value: Pin) => value.id === id))
-    // TODO: Make child editable
+    const panel = this.service.pins().findIndex((value: Pin) => value.id === id)
+    this.openPanel.set(panel);
+    this.editPanel.set(panel);
   }
 
   toggle() {

@@ -7,6 +7,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { ReactiveFormsModule, Validators, FormGroup, FormControl, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 import {TextFieldModule} from '@angular/cdk/text-field';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /*TODO:
 -Connect service
@@ -77,10 +78,13 @@ interface editForm {
 export class LocationDetailComponent {
   service = inject(PinsService);
   open = input(false);
+  // toEdit = input(false);
 
-  constructor() {
-    
-  }
+  // private editObs = toObservable(this.toEdit);
+
+  // constructor() {
+  //   this.editObs.subscribe(() => this.edit());
+  // }
 
   editing: boolean = false;
   submitted: boolean = false;
@@ -114,7 +118,7 @@ export class LocationDetailComponent {
 
   }
 
-    onSubmit() {
+  onSubmit() {
     this.submitted = true;
     this.editing = false;
     // I did a bad thing and added "!" to bypass undefined posibility, if time will fix
