@@ -22,7 +22,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     </mat-slider>
   </mat-toolbar>
 
-  <app-location-list [(openPanel)]="openPin" [sliderValue]="this.sliderValue" #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
+  <app-location-list [(openPanel)]="openPin" [(sliderValue)]="this.sliderValue" #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
   `,
   styles: `
     .title {

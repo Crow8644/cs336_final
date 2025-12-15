@@ -1,4 +1,4 @@
-import { Component, inject, model, output, signal, Input } from '@angular/core';
+import { Component, inject, model, output, signal, Input, computed } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { PinComponent } from '../pin/pin.component';
 import { ZoomComponent } from '../zoom/zoom.component';
@@ -65,7 +65,8 @@ export class MapViewComponent {
   onAddPin = output<string>();
 
   //For recieving the sliderFilter value, chatGPT suggested making the sliderValue a signal
-  @Input() sliderValue = signal(0);
+  // @Input() sliderValue = signal(0);
+  sliderValue = model(0);
 
   public initialHeight = window.innerHeight;
   public zoomFactor = signal(1); // Making zoom factor a signal and passing it to the zoom component as a model lets the zoom component change it.
