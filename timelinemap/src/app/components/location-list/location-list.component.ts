@@ -23,7 +23,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
         </mat-accordion>
       </mat-sidenav>
       <mat-sidenav-content>
-        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)" [(sliderValue)]="this.sliderValue"></app-map-view>
+        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)" [(sliderValue)]="this.sliderValue" id="map-view"></app-map-view>
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -38,13 +38,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
       position: relative;
       
     }
-    #map-container {
-      display: inline-block;
-      overflow: scroll;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      right: 0;
+    #map-view {
       z-index: -1;
     }
   `

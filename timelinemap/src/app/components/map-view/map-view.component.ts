@@ -36,10 +36,6 @@ import { MatButtonModule } from '@angular/material/button';
       z-index: -1;
     }
     #map-container {
-      overflow: scroll;
-      bottom: 0;
-      right: 0;
-      margin: 0;
     }
     .pin-container {
       position: absolute;
@@ -98,8 +94,10 @@ export class MapViewComponent {
       // Post where I found out about it: https://stackoverflow.com/questions/36532307/rem-px-in-javascript
       const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
 
+      const adjustmentForHeight = 650 / (this.zoomFactor() * this.initialHeight);
+
       const x = ((event.pageX / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
-      const y = ((event.pageY / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
+      const y = (((event.pageY / px_per_rem) - (5.5 - adjustmentForHeight)) * 10) / (this.zoomFactor() * this.initialHeight);
 
       // TODO: Let the user set the data
       this.service.addPin({
@@ -112,16 +110,15 @@ export class MapViewComponent {
     }
   }
 
-  // HACK: Because finding the dimentions of the image is hard, everything is scaled around the height.
-  // This means, in the datbase y is a percentage and x is a pixel number
-
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    return ((y / 10) - 0.006) * this.zoomFactor() * this.initialHeight;
+    // Most of these numbers were just fiddled with until they worked correctly
+    const adjustmentForHeight = 650 / (this.zoomFactor() * this.initialHeight);
+    return (((y / 10)) * this.zoomFactor() * this.initialHeight) - (3.5 + adjustmentForHeight);
   }
 
   translate_x(x: number) {
-    return (((x / 10) - 0.00005) * this.zoomFactor() * this.initialHeight) - 0.8;
+    return (((x / 10) - 0.000045) * this.zoomFactor() * this.initialHeight) - 0.8;
   }
   
 }
