@@ -40,7 +40,7 @@ import { MatButtonModule } from '@angular/material/button';
       bottom: 0;
       right: 0;
       margin: 0;
-    }
+      background-color: rgb(68, 73, 83);
     .pin-container {
       position: absolute;
       width: 10rem;
