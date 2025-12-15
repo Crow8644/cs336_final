@@ -25,7 +25,6 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 })
 export class AppComponent {
   service = inject(PinsService);
-
   title = 'timelinemap';
   constructor() {
 

@@ -33,6 +33,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
     width: 100%;
     height: 100vh;
   }
+  mat-sidenav {
+    background-color: rgb(33, 36, 40);
+  }
 
       #map-image {
       position: relative;
