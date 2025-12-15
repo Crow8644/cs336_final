@@ -16,7 +16,7 @@ import { MapViewComponent } from './components/map-view/map-view.component';
   imports: [MapViewComponent, RouterOutlet, LocationDetailComponent, LocationListComponent, TimelineComponent, PinComponent, MatIcon],
   template: `
     <app-timeline></app-timeline>
-    <app-map-view></app-map-view>
+    <!--<app-map-view></app-map-view>-->
 
     <router-outlet />
   `,
