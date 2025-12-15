@@ -23,7 +23,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
         </mat-accordion>
       </mat-sidenav>
       <mat-sidenav-content>
-        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)"></app-map-view>
+        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)" [sliderValue]="this.sliderValue"></app-map-view>
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -53,6 +53,7 @@ export class LocationListComponent {
   service = inject(PinsService)
      @ViewChild('sidenav') sidenav!: MatSidenav;
   openPanel = model(-1); // Set to negative 1 so everything is closed by default
+  sliderValue = input<number>(0);
 
   editPanel = signal(-1);
 
