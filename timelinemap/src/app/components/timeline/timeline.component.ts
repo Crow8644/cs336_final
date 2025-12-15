@@ -59,7 +59,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
   `
 })
 export class TimelineComponent {
-  public openPin = signal(-1); // Set to negative 1 so everything is closed by default
+  public openPin = signal(""); // Set to negative 1 so everything is closed by default
   @ViewChild('locationList') locationList!: LocationListComponent;
   sliderValue = signal(0);
 
