@@ -17,13 +17,13 @@ import { toObservable } from '@angular/core/rxjs-interop';
           <!-- CONNECT SERVICE HERE for list of locations -->
           @for (location of service.pins(); track $index){
             <app-location-detail [data]="location" 
-            [open]="openPanel() === $index"
+            [open]="openPanel() === location.id"
           ></app-location-detail>
           }
         </mat-accordion>
       </mat-sidenav>
       <mat-sidenav-content>
-        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)" [(sliderValue)]="this.sliderValue"></app-map-view>
+        <app-map-view [(openPin)]="openPanel" (onAddPin)="pinAdded($event)" [(sliderValue)]="this.sliderValue" id="map-view"></app-map-view>
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -41,13 +41,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
       position: relative;
       
     }
-    #map-container {
-      display: inline-block;
-      overflow: scroll;
-      position: absolute;
-      width: 100%;
-      bottom: 0;
-      right: 0;
+    #map-view {
       z-index: -1;
     }
   `
@@ -55,10 +49,10 @@ import { toObservable } from '@angular/core/rxjs-interop';
 export class LocationListComponent {
   service = inject(PinsService)
      @ViewChild('sidenav') sidenav!: MatSidenav;
-  openPanel = model(-1); // Set to negative 1 so everything is closed by default
+  openPanel = model(""); // Set to blank 1 so everything is closed by default
   sliderValue = model(0);
 
-  editPanel = signal(-1);
+  editPanel = signal("");
 
   constructor() {
     this.openPanel.subscribe(() => this.sidenav.open());
@@ -66,8 +60,8 @@ export class LocationListComponent {
 
   pinAdded(id: string) {
     const panel = this.service.pins().findIndex((value: Pin) => value.id === id)
-    this.openPanel.set(panel);
-    this.editPanel.set(panel);
+    this.openPanel.set(id);
+    this.editPanel.set(id);
   }
 
   toggle() {

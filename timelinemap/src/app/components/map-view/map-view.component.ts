@@ -15,9 +15,9 @@ import { MatButtonModule } from '@angular/material/button';
       />
 
       <!-- These pins are positioned relative to their original position under the map -->
-      @for (location of filteredPins(); track $index){
+      @for (location of filteredPins(); track location.id){
         <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
-          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor" (openned)="openUp($index)"></app-pin>
+          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor" (openned)="openUp(location.id)"></app-pin>
         </div>
       }
       <span id="zoom-containter">
@@ -36,11 +36,7 @@ import { MatButtonModule } from '@angular/material/button';
       z-index: -1;
     }
     #map-container {
-      overflow: scroll;
-      bottom: 0;
-      right: 0;
-      margin: 0;
-      background-color: rgb(68, 73, 83);
+    }
     .pin-container {
       position: absolute;
       width: 10rem;
@@ -61,7 +57,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class MapViewComponent {
   service = inject(PinsService);
-  openPin = model(-1);
+  openPin = model("");
   onAddPin = output<string>();
 
   //For recieving the sliderFilter value, chatGPT suggested making the sliderValue a signal
@@ -83,9 +79,9 @@ export class MapViewComponent {
       pin.startTime! <= this.sliderValue() && pin.endTime! >= this.sliderValue()
     )
   );
-  public openUp(index: number) {
-    if (this.openPin() === index) this.openPin.set(-1); // This setting makes it so we can open the same pin multiple names in a row
-    this.openPin.set(index);
+  public openUp(id: string) {
+    if (this.openPin() === id) this.openPin.set(""); // This setting makes it so we can open the same pin multiple names in a row
+    this.openPin.set(id);
   }
 
   toggleCheck() {
@@ -98,30 +94,32 @@ export class MapViewComponent {
       // Post where I found out about it: https://stackoverflow.com/questions/36532307/rem-px-in-javascript
       const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
 
+      const adjustmentForHeight = 650 / (this.zoomFactor() * this.initialHeight);
+
       const x = ((event.pageX / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
-      const y = ((event.pageY / px_per_rem) * 10) / (this.zoomFactor() * this.initialHeight);
+      const y = (((event.pageY / px_per_rem) - (5.5 - adjustmentForHeight)) * 10) / (this.zoomFactor() * this.initialHeight);
 
       // TODO: Let the user set the data
       this.service.addPin({
         x,
         y,
-        name: "testAddPin",
+        name: "location",
+        description: "Describe your location here.",
       }).then((ref) => this.onAddPin.emit(ref.id));
 
       this.creating = false;
     }
   }
 
-  // HACK: Because finding the dimentions of the image is hard, everything is scaled around the height.
-  // This means, in the datbase y is a percentage and x is a pixel number
-
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    return ((y / 10) - 0.006) * this.zoomFactor() * this.initialHeight;
+    // Most of these numbers were just fiddled with until they worked correctly
+    const adjustmentForHeight = 650 / (this.zoomFactor() * this.initialHeight);
+    return (((y / 10)) * this.zoomFactor() * this.initialHeight) - (3.5 + adjustmentForHeight);
   }
 
   translate_x(x: number) {
-    return (((x / 10) - 0.00005) * this.zoomFactor() * this.initialHeight) - 0.8;
+    return (((x / 10) - 0.000045) * this.zoomFactor() * this.initialHeight) - 0.8;
   }
   
 }

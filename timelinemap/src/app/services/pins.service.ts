@@ -111,7 +111,7 @@ export class PinsService {
       
       // Interesting note, Firebase does not support undefined
       startTime: pin.startTime ?? 0,
-      endTime: pin.endTime ?? Number.MAX_VALUE,
+      endTime: pin.endTime ?? 1000,
     })
 
     return ref;
