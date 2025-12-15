@@ -15,9 +15,9 @@ import { MatButtonModule } from '@angular/material/button';
       />
 
       <!-- These pins are positioned relative to their original position under the map -->
-      @for (location of filteredPins(); track $index){
+      @for (location of filteredPins(); track location.id){
         <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
-          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor" (openned)="openUp($index)"></app-pin>
+          <app-pin [data]="location" class="pin" [(scaleFactor)]="zoomFactor" (openned)="openUp(location.id)"></app-pin>
         </div>
       }
       <span id="zoom-containter">
@@ -57,7 +57,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class MapViewComponent {
   service = inject(PinsService);
-  openPin = model(-1);
+  openPin = model("");
   onAddPin = output<string>();
 
   //For recieving the sliderFilter value, chatGPT suggested making the sliderValue a signal
@@ -79,9 +79,9 @@ export class MapViewComponent {
       pin.startTime! <= this.sliderValue() && pin.endTime! >= this.sliderValue()
     )
   );
-  public openUp(index: number) {
-    if (this.openPin() === index) this.openPin.set(-1); // This setting makes it so we can open the same pin multiple names in a row
-    this.openPin.set(index);
+  public openUp(id: string) {
+    if (this.openPin() === id) this.openPin.set(""); // This setting makes it so we can open the same pin multiple names in a row
+    this.openPin.set(id);
   }
 
   toggleCheck() {
@@ -103,7 +103,8 @@ export class MapViewComponent {
       this.service.addPin({
         x,
         y,
-        name: "testAddPin",
+        name: "location",
+        description: "Describe your location here.",
       }).then((ref) => this.onAddPin.emit(ref.id));
 
       this.creating = false;
