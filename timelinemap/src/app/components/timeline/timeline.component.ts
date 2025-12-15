@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatButtonModule} from '@angular/material/button';
@@ -11,18 +11,17 @@ import { LocationListComponent } from '../location-list/location-list.component'
   template: `
   <mat-toolbar class="header">
 
-    <button matIconButton id = "showLocList" (click) = "showLocList()">
+    <button matIconButton id = "showLocList" (click)="locationList.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
     <h1 class = "title"> Map Maker </h1>
 
     <mat-slider discrete min = "0" max = "1000">  <!-- CONNECT TO SERVICE LATER (min and max) -->
-      <input matSliderStartThumb>
-      <input matSliderEndThumb>
+      <input matSliderThumb> <!-- Style so slider is just a point instead of a line -->
     </mat-slider>
   </mat-toolbar>
 
-  <app-location-list [hidden]="!locList"> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
+  <app-location-list  #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
   `,
   styles: `
     .title {
@@ -30,7 +29,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     }
 
     mat-slider {
-      
+
     }
 
     .header {
@@ -41,9 +40,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
   `
 })
 export class TimelineComponent {
-  locList = false;
-  showLocList(): void{
-    this.locList = !this.locList;
-  }
+  @ViewChild('locationList') locationList!: LocationListComponent;
+
 
 }
