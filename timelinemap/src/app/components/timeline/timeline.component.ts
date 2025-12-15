@@ -35,6 +35,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     .header {
       position: sticky;
       top: 0;
+      z-index: 1;
     }
   `
 })

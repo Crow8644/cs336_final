@@ -3,12 +3,13 @@ import { addDoc, collection, collectionData, doc, docData, documentId, Firestore
 import { DomSanitizer } from '@angular/platform-browser';
 import { async, map, Observable } from 'rxjs';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { deleteDoc, setDoc } from '@firebase/firestore';
+import { deleteDoc, setDoc, updateDoc } from '@firebase/firestore';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 const default_icon = "Flag";
 
 export interface Pin {
+  id: string,
   // Even in a real pin, these can be undefined, meaning there was no start or no end time
   startTime?: number,
   endTime?: number,
@@ -25,6 +26,7 @@ const default_pin: Pin = {
   name: "blank",
   icon: default_icon,
   description: "",
+  id: "",
 }
 
 @Injectable({
@@ -40,6 +42,7 @@ export class PinsService {
 
   public pins = signal<Pin[]>([]);
   private map_url = signal<string>("");
+  private current_map_name = "default-map";
 
   public safe_map_url = computed(() => this.sani.bypassSecurityTrustResourceUrl(encodeURI(this.map_url())))
   
@@ -48,7 +51,8 @@ export class PinsService {
   }
 
   public async load_map(map_name: string) {
-    let map_id = "";
+    this.current_map_name = map_name;
+    let map_image_id = "";
     const map_collection = collection(this.firestore, 'mapping-application');
 
     // Also this: https://javascript.plainenglish.io/querying-firestore-for-documents-with-an-array-of-ids-c76d3081c5ef
@@ -64,11 +68,9 @@ export class PinsService {
         }
     })
 
-    console.log(mapData);
-
-    map_id = mapData[0].map;
+    map_image_id = mapData[0].map;
     const q2 = query(mapData[0].pins)
-    const pin_data = collectionData<Partial<Pin>>(q2)
+    const pin_data = collectionData<Partial<Pin>>(q2, {idField: 'id'})
     
     // Turns and an observable into a signal for outside use
     pin_data.subscribe(data => this.pins.set(data.map(record => {
@@ -78,6 +80,7 @@ export class PinsService {
           icon: record.icon ?? default_icon,
           name: record.name ?? "blank",
           description: record.description ?? "",
+          id: record.id || "",
           
           startTime: record.startTime,
           endTime: record.endTime,
@@ -85,28 +88,35 @@ export class PinsService {
     ))
 
     // A post that helped me figure out what to do here: https://stackoverflow.com/questions/76571331/using-async-await-in-angular-computed-signal
-    this.map_url.set( await getDownloadURL(ref(this.storage, encodeURI(map_id))) )
+    this.map_url.set( await getDownloadURL(ref(this.storage, encodeURI(map_image_id))) )
   }
 
   // Good site: https://www.bezkoder.com/angular-17-firestore-crud/
 
-  public addPin(map_name: string, pin: Partial<Pin>) {
-    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(map_name) + 'pins'));
+  public async addPin(pin: Partial<Pin>) {
+    const collection_ref = collection(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins'));
 
-    addDoc(collection_ref, {
+    await addDoc(collection_ref, {
       x: pin.x ?? 20,
       y: pin.y ?? 20,
       icon: pin.icon ?? default_icon,
       name: pin.name ?? "blank",
       description: pin.description ?? "",
       
-      startTime: pin.startTime,
-      endTime: pin.endTime,
+      // Interesting note, Firebase does not support undefined
+      startTime: pin.startTime ?? 0,
+      endTime: pin.endTime ?? Number.MAX_VALUE,
     })
   }
 
-  public deletePin(map_name: string, pinID: string) {
-    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(map_name) + 'pins'));
+  public async updatePin(pin: Partial<Pin>) {
+    const doc_ref = doc(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins/' + encodeURIComponent(pin.id ?? "")));
+
+    await updateDoc(doc_ref, pin);
+  }
+
+  public deletePin(pinID: string) {
+    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(this.current_map_name) + 'pins'));
 
     const pin_ref = doc(collection_ref, pinID); // Selector for the specific pin with that the passed id
 

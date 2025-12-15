@@ -1,7 +1,7 @@
-import { Component, input, OnInit  } from '@angular/core';
+import { Component, input, inject  } from '@angular/core';
 //import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
-import { Pin } from '../../services/pins.service';
+import { PinsService, Pin } from '../../services/pins.service';
 import { LocationEditingComponent } from '../location-editing/location-editing.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
@@ -61,7 +61,7 @@ interface editForm {
           </textarea>
           <!-- CONNECT SERVICE HERE --> 
 
-          <button type="submit" (click) = "edit()">Save</button>
+          <button type="submit">Save</button>
       </form>
       }
 
@@ -75,6 +75,7 @@ interface editForm {
   styles: ``
 })
 export class LocationDetailComponent {
+  service = inject(PinsService);
   editing: boolean = false;
   submitted: boolean = false;
   public data = input.required<Pin>();
@@ -101,6 +102,7 @@ export class LocationDetailComponent {
         startDate: this.data().startTime,
         endDate: this.data().endTime,
         description: this.data().description,
+        
       });
   }
 
@@ -108,6 +110,8 @@ export class LocationDetailComponent {
 
     onSubmit() {
     this.submitted = true;
-    updatePin({name: "this.editingForm.locationName", startTime: "this.editingForm.startDate", endTime: "this.editingForm.endDate", description: "this.editingForm.description", id: location.id})
+    this.editing = false;
+    // I did a bad thing and added "!" to bypass undefined posibility, if time will fix
+    this.service.updatePin({name: this.editingForm.value.locationName!, startTime: this.editingForm.value.startDate, endTime: this.editingForm.value.endDate, description: this.editingForm.value.description!, id: this.data().id})
   }
 }
