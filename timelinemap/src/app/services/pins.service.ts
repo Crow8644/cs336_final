@@ -96,7 +96,7 @@ export class PinsService {
   public async addPin(pin: Partial<Pin>) {
     const collection_ref = collection(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins'));
 
-    await addDoc(collection_ref, {
+    const ref = await addDoc(collection_ref, {
       x: pin.x ?? 20,
       y: pin.y ?? 20,
       icon: pin.icon ?? default_icon,
@@ -107,6 +107,8 @@ export class PinsService {
       startTime: pin.startTime ?? 0,
       endTime: pin.endTime ?? Number.MAX_VALUE,
     })
+
+    return ref;
   }
 
   public async updatePin(pin: Partial<Pin>) {

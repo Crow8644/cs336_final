@@ -1,4 +1,4 @@
-import { Component, input, inject  } from '@angular/core';
+import { Component, input, inject, computed  } from '@angular/core';
 //import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { PinsService, Pin } from '../../services/pins.service';
@@ -29,7 +29,7 @@ interface editForm {
 <!-- I orginally had the entire expansion pannel in the @if and @else, but that was causing issues, ChatGPT suggested only putting the form parts in @if and @else
 <!-- The form for editing the location -->
 
-  <mat-expansion-panel [expanded]="true">
+  <mat-expansion-panel [expanded]="open()">
         <mat-expansion-panel-header>
           <mat-panel-title>
                 {{data().name}}    
@@ -76,6 +76,12 @@ interface editForm {
 })
 export class LocationDetailComponent {
   service = inject(PinsService);
+  open = input(false);
+
+  constructor() {
+    
+  }
+
   editing: boolean = false;
   submitted: boolean = false;
   public data = input.required<Pin>();
