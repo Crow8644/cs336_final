@@ -16,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 
       <!-- These pins are positioned relative to their original position under the map -->
       @for (location of service.pins(); track $index){
-        <div class="pin-container" style="left: {{translate_x(location.x)}}px; top: {{translate_y(location.y) - ($index * 16)}}px">
+        <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
           <app-pin [data]="location" class="pin"></app-pin>
         </div>
       }
@@ -42,9 +42,10 @@ import { MatButtonModule } from '@angular/material/button';
       margin: 0;
     }
     .pin-container {
-      position: relative;
+      position: absolute;
       height: 0;
       width: 10rem;
+      z-index: 0;
     }
     #zoom-containter {
       position: fixed;
@@ -77,8 +78,10 @@ export class MapViewComponent {
 
   makePin(event: MouseEvent) {
     if (this.creating) {
-      const x = event.offsetX / this.zoomFactor();
-      const y = (event.offsetY / (this.initialHeight * this.zoomFactor())) * 100;
+      const px_per_rem = parseFloat(getComputedStyle(document.documentElement).fontSize)
+
+      const x = ((event.pageX / px_per_rem) * 10) / this.zoomFactor();
+      const y = ((event.pageY / px_per_rem) * 10) / this.zoomFactor();
 
       // TODO: Let the user set the data
       this.service.addPin({
@@ -96,20 +99,10 @@ export class MapViewComponent {
 
   // Trnaslate what's in  the databae to what should be onscreen:
   translate_y(y: number) {
-    // y needs to be converted to pixels
-    const chunk = this.initialHeight / 100
-    const position = (y * chunk - this.initialHeight) * this.zoomFactor();
-
-    // The subtration at the end attempts to adjust it so the point of the arrow is at the calculated point,
-    // Not the top left corner of the div. These number's aren't perfect yet
-    return position - 64;
+    return (y / 10) * this.zoomFactor();
   }
 
   translate_x(x: number) {
-    const position = x * this.zoomFactor();
-
-    // The subtration at the end attempts to adjust it so the point of the arrow is at the calculated point,
-    // Not the top left corner of the div. These number's aren't perfect yet
-    return position - 12;
+    return (x / 10) * this.zoomFactor();
   }
 }
