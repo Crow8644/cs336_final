@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input, model, ViewContainerRef, ViewRef } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { Pin } from '../../services/pins.service'
 import { MatIcon } from '@angular/material/icon';
@@ -9,7 +9,7 @@ import { MatIcon } from '@angular/material/icon';
   imports: [MatIcon],
   template: `
     <span id="container">
-      <p class="name-display">{{data().id}}</p>
+      <p class="name-display">{{data().name}}</p>
       <mat-icon class="material-symbols-outlined icon">{{data().icon}}</mat-icon>
       <br/>
       <mat-icon class="material-symbols-outlined pointer">keyboard_arrow_down</mat-icon>
@@ -21,7 +21,6 @@ import { MatIcon } from '@angular/material/icon';
       margin-left: 0.2rem;
       margin-bottom: 0.2rem;
       font-style: italic;
-      width: 5rem;
     }
     #container:hover .name-display {
       visibility: visible;
@@ -34,9 +33,13 @@ import { MatIcon } from '@angular/material/icon';
   `
 })
 export class PinComponent {
+  private viewContainer = inject(ViewContainerRef);
+  
   public data = input.required<Pin>();
+  scaleFactor = model(1); // Optionally takes a signal to scale fonts
+
   constructor() {
-    this.data
+    
   }
 }
 
