@@ -6,10 +6,10 @@ import { MatIcon } from '@angular/material/icon';
   selector: 'app-zoom',
   imports: [MatButtonModule, MatIcon],
   template: `
-    <button matMiniFab aria-label="Zoom Out" (click)="zoomOut()">
+    <button mat-mini-fab aria-label="Zoom Out" (click)="zoomOut()">
       <mat-icon>remove</mat-icon>
     </button>
-    <button matMiniFab aria-label="Zoom In" (click)="zoomIn()">
+    <button mat-mini-fab aria-label="Zoom In" (click)="zoomIn()">
       <mat-icon>add</mat-icon>
     </button>
   `,

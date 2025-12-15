@@ -2,23 +2,33 @@ import { Component, inject, signal } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { PinComponent } from '../pin/pin.component';
 import { ZoomComponent } from '../zoom/zoom.component';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-map-view',
-  imports: [PinComponent, ZoomComponent],
+  imports: [PinComponent, ZoomComponent, MatButtonModule],
   template: `
     <div id="map-container">
-      <img [src]="service.safe_map_url()" id="map-image" style="height: {{initialHeight * zoomFactor()}}px" (click)="makePin($event)"/>
+      <img [src]="service.safe_map_url()" id="map-image" 
+        style="height: {{initialHeight * zoomFactor()}}px; cursor: {{creating ? 'crosshair' : 'auto'}}" 
+        (click)="makePin($event)"
+      />
 
       <!-- These pins are positioned relative to their original position under the map -->
       @for (location of service.pins(); track $index){
-        <span class="pin-container" style="left: {{translate_x(location.x)}}px; top: {{translate_y(location.y)}}px">
+        <div class="pin-container" style="left: {{translate_x(location.x)}}px; top: {{translate_y(location.y) - ($index * 16)}}px">
           <app-pin [data]="location" class="pin"></app-pin>
-        </span>
+        </div>
       }
       <span id="zoom-containter">
         <app-zoom [(scaleFactor)]="zoomFactor"></app-zoom>
       </span>
+
+      <button mat-button id="make-pin-button" 
+        style="background: {{creating ? 'aqua' : 'white'}}" 
+        (click)="toggleCheck()">
+        Create Location
+      </button>
     </div>
   `,
   styles: `
@@ -41,6 +51,12 @@ import { ZoomComponent } from '../zoom/zoom.component';
       bottom: 0;
       right: 0;
     }
+    #make-pin-button {
+      position: fixed;
+      bottom: 3.5rem;
+      margin: 1rem;
+      right: 0;
+    }
   `
 })
 export class MapViewComponent {
@@ -49,14 +65,30 @@ export class MapViewComponent {
   public initialHeight = window.innerHeight;
   public zoomFactor = signal(1); // Making zoom factor a signal and passing it to the zoom component as a model lets the zoom component change it.
 
+  public creating: boolean = false;
+
   constructor() {
+
+  }
+
+  toggleCheck() {
+    this.creating = !this.creating;
   }
 
   makePin(event: MouseEvent) {
-    // Unfinished: used to make a pin
-    // TODO: turn this off when user's haven't selected a 'make pin' button
-    const x = event.offsetX;
-    const y = (event.offsetY / (this.initialHeight * this.zoomFactor())) * 100
+    if (this.creating) {
+      const x = event.offsetX / this.zoomFactor();
+      const y = (event.offsetY / (this.initialHeight * this.zoomFactor())) * 100;
+
+      // TODO: Let the user set the data
+      this.service.addPin({
+        x,
+        y,
+        name: "testAddPin",
+      })
+
+      this.creating = false;
+    }
   }
 
   // HACK: Because finding the dimentions of the image is hard, everything is scaled around the height.
