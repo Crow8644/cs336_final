@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, signal } from '@angular/core';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatButtonModule} from '@angular/material/button';
@@ -7,6 +7,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
 
 @Component({
   selector: 'app-timeline',
+  standalone: true,
   imports: [MatToolbarModule, MatSliderModule, MatButtonModule, MatIconModule, LocationListComponent],
   template: `
   <mat-toolbar class="header">
@@ -16,12 +17,12 @@ import { LocationListComponent } from '../location-list/location-list.component'
     </button>
     <h1 class = "title"> Map Maker </h1>
 
-    <mat-slider discrete min = "0" max = "1000">  <!-- CONNECT TO SERVICE LATER (min and max) -->
+    <mat-slider discrete min = "0" max = "1000" (input) = "sliderChanged($event)">  <!-- CONNECT TO SERVICE LATER (min and max) --> <!--[(ngModel)] = 'sliderFilter'-->
       <input matSliderThumb> <!-- Style so slider is just a point instead of a line -->
     </mat-slider>
   </mat-toolbar>
 
-  <app-location-list  #locationList> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
+  <app-location-list  #locationList [sliderValue]="this.sliderValue"> </app-location-list> <!-- this way of toggling was suggested by chatGPT -->
   `,
   styles: `
     .title {
@@ -41,6 +42,11 @@ import { LocationListComponent } from '../location-list/location-list.component'
 })
 export class TimelineComponent {
   @ViewChild('locationList') locationList!: LocationListComponent;
+  sliderValue = signal(0);
 
+  sliderChanged(event: Event){
+    const newValue = (event.target as HTMLInputElement).valueAsNumber;
+    this.sliderValue.set(newValue); // updates the signal
+  }
 
 }

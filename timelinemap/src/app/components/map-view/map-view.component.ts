@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, Input, computed } from '@angular/core';
 import { PinsService } from '../../services/pins.service';
 import { PinComponent } from '../pin/pin.component';
 import { ZoomComponent } from '../zoom/zoom.component';
@@ -15,7 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
       />
 
       <!-- These pins are positioned relative to their original position under the map -->
-      @for (location of service.pins(); track $index){
+      @for (location of filteredPins(); track $index){
         <div class="pin-container" style="left: {{translate_x(location.x)}}rem; top: {{translate_y(location.y)}}rem">
           <app-pin [data]="location" class="pin"></app-pin>
         </div>
@@ -63,6 +63,9 @@ import { MatButtonModule } from '@angular/material/button';
 export class MapViewComponent {
   service = inject(PinsService);
 
+  //For recieving the sliderFilter value, chatGPT suggested making the sliderValue a signal
+  @Input() sliderValue = signal(0);
+
   public initialHeight = window.innerHeight;
   public zoomFactor = signal(1); // Making zoom factor a signal and passing it to the zoom component as a model lets the zoom component change it.
 
@@ -71,6 +74,13 @@ export class MapViewComponent {
   constructor() {
 
   }
+
+  //filter based off assignment 14
+  filteredPins = computed(() =>
+    this.service.pins().filter(pin =>
+      pin.startTime! <= this.sliderValue() && pin.endTime! >= this.sliderValue()
+    )
+  );
 
   toggleCheck() {
     this.creating = !this.creating;
@@ -105,4 +115,5 @@ export class MapViewComponent {
   translate_x(x: number) {
     return (x / 10) * this.zoomFactor();
   }
+  
 }

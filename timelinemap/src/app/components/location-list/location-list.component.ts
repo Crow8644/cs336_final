@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, Input, signal } from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { LocationDetailComponent } from '../location-detail/location-detail.component';
 import {MatExpansionModule} from '@angular/material/expansion';
@@ -20,7 +20,7 @@ import { MapViewComponent } from '../map-view/map-view.component';
         </mat-accordion>
       </mat-sidenav>
       <mat-sidenav-content>
-        <app-map-view></app-map-view>
+        <app-map-view [sliderValue]="this.sliderValue"></app-map-view>
       </mat-sidenav-content>
   
     </mat-sidenav-container>
@@ -48,6 +48,7 @@ import { MapViewComponent } from '../map-view/map-view.component';
 })
 export class LocationListComponent {
   service = inject(PinsService);
+   @Input() sliderValue = signal(0);
    @ViewChild('sidenav') sidenav!: MatSidenav;
 
   toggle() {
