@@ -72,8 +72,9 @@ interface editForm {
           </mat-form-field>
           <!-- CONNECT SERVICE HERE --> 
           <br>
-          <button type="submit" mat-mini-fab>Save</button>
+          <button type="submit"   [disabled]="editingForm.invalid" mat-mini-fab>Save</button> 
           <!-- So you can only edit if you aren't editing -->
+          <button (click) = "deleteLocation()" mat-mini-fab class ="delete" >Delete</button>
       </form>
       }
 
@@ -99,6 +100,12 @@ interface editForm {
     mat-panel-title {
       color: rgb(220, 225, 233);;
     }
+
+  .delete {
+    margin-left: 12rem;
+    color: red;
+  }
+
   
   `
 })
@@ -118,9 +125,9 @@ export class LocationDetailComponent {
   public data = input.required<Pin>();
   editingForm = new FormGroup(
     {
-      locationName: new FormControl(''), //'', Validators.required
-      startDate: new FormControl(),
-      endDate: new FormControl(),
+      locationName: new FormControl('', Validators.required), //'', Validators.required
+      startDate: new FormControl(1, [Validators.pattern('[0-9]+')]),
+      endDate: new FormControl(1000, Validators.pattern('[0-9]+')),
       description: new FormControl(''),
     },
 
@@ -150,5 +157,10 @@ export class LocationDetailComponent {
     this.editing = false;
     // I did a bad thing and added "!" to bypass undefined posibility, if time will fix
     this.service.updatePin({name: this.editingForm.value.locationName!, startTime: this.editingForm.value.startDate, endTime: this.editingForm.value.endDate, description: this.editingForm.value.description!, id: this.data().id})
+  }
+
+  deleteLocation() {
+    this.editing = false;
+    this.service.deletePin(this.data().id);
   }
 }
