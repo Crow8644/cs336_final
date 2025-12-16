@@ -1,9 +1,10 @@
-import { Component, ViewChild, signal } from '@angular/core';
+import { Component, ViewChild, computed, inject, signal } from '@angular/core';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { LocationListComponent } from '../location-list/location-list.component';
+import { PinsService } from '../../services/pins.service';
 
 @Component({
   selector: 'app-timeline',
@@ -17,7 +18,7 @@ import { LocationListComponent } from '../location-list/location-list.component'
     </button>
     <h1 class = "title"> Map Maker </h1>
 
-    <mat-slider class="custom-slider"  min = "0" max = "1000" (input) = "sliderChanged($event)">
+    <mat-slider class="custom-slider"  min = "0" max = "{{maxVal()}}" (input) = "sliderChanged($event)">
       <input matSliderThumb> <!-- Style so slider is just a point instead of a line -->
     </mat-slider>
     <div class="slider-value">{{ sliderValue() }}</div>
@@ -62,6 +63,23 @@ export class TimelineComponent {
   public openPin = signal(""); // Set to negative 1 so everything is closed by default
   @ViewChild('locationList') locationList!: LocationListComponent;
   sliderValue = signal(0);
+
+  service = inject(PinsService);
+
+  public maxVal = computed(() => 
+    this.service.pins().map(entry => {
+      if (entry.endTime === Number.MAX_VALUE) {
+        return 0;
+      }
+      else {
+        return entry.endTime ?? 0;
+      }
+    }).reduce((prev, current) => ((prev ?? 0) > (current ?? 0)) ? prev : current, 0)
+  );
+
+  constructor() {
+
+  }
 
   sliderChanged(event: Event){
     const newValue = (event.target as HTMLInputElement).valueAsNumber;
