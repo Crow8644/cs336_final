@@ -2,13 +2,11 @@ import { Component, input, inject, computed  } from '@angular/core';
 //import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { PinsService, Pin } from '../../services/pins.service';
-import { LocationEditingComponent } from '../location-editing/location-editing.component';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import { ReactiveFormsModule, Validators, FormGroup, FormControl, AbstractControl, ValidationErrors, ValidatorFn, } from '@angular/forms';
 import { MatFormFieldModule} from '@angular/material/form-field';
 import {TextFieldModule} from '@angular/cdk/text-field';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { MatInputModule} from '@angular/material/input'
 import {MatSelectModule} from '@angular/material/select';
 
@@ -28,7 +26,7 @@ interface editForm {
 //https://dev.to/this-is-angular/how-to-combine-add-and-edit-forms-in-angular-4888
 @Component({
   selector: 'app-location-detail',
-  imports: [MatExpansionModule, LocationEditingComponent, MatButtonModule, MatIconModule, ReactiveFormsModule, TextFieldModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [MatExpansionModule, MatButtonModule, MatIconModule, ReactiveFormsModule, TextFieldModule, MatFormFieldModule, MatInputModule, MatSelectModule],
   template: `
 <!-- I orginally had the entire expansion pannel in the @if and @else, but that was causing issues, ChatGPT suggested only putting the form parts in @if and @else
 <!-- The form for editing the location -->

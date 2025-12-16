@@ -1,10 +1,9 @@
 import { computed, inject, Injectable, signal, Signal } from '@angular/core';
 import { addDoc, collection, collectionData, doc, docData, documentId, Firestore, getDocs, orderBy, query, Timestamp, where } from '@angular/fire/firestore';
 import { DomSanitizer } from '@angular/platform-browser';
-import { async, map, Observable } from 'rxjs';
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { deleteDoc, setDoc, updateDoc } from '@firebase/firestore';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {  } from '@angular/core/rxjs-interop';
 
 const default_icon = "Flag";
 

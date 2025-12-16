@@ -4,7 +4,6 @@ import { LocationDetailComponent } from '../location-detail/location-detail.comp
 import {MatExpansionModule} from '@angular/material/expansion';
 import { Pin, PinsService } from '../../services/pins.service';
 import { MapViewComponent } from '../map-view/map-view.component';
-import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-location-list',
