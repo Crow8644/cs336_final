@@ -78,5 +78,6 @@ Stadium
 Castle
 Fort
 Things To Do
+Church
 
 */
