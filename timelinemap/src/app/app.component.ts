@@ -7,7 +7,7 @@ import { MapViewComponent } from './components/map-view/map-view.component';
 
 @Component({
   selector: 'app-root',
-  imports: [MapViewComponent, RouterOutlet, TimelineComponent],
+  imports: [RouterOutlet, TimelineComponent],
   template: `
     <app-timeline></app-timeline>
     <!--<app-map-view></app-map-view>-->
