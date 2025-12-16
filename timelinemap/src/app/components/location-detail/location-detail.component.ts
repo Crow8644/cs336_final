@@ -10,6 +10,7 @@ import { MatFormFieldModule} from '@angular/material/form-field';
 import {TextFieldModule} from '@angular/cdk/text-field';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { MatInputModule} from '@angular/material/input'
+import {MatSelectModule} from '@angular/material/select';
 
 /*TODO:
 -Connect service
@@ -27,7 +28,7 @@ interface editForm {
 //https://dev.to/this-is-angular/how-to-combine-add-and-edit-forms-in-angular-4888
 @Component({
   selector: 'app-location-detail',
-  imports: [MatExpansionModule, LocationEditingComponent, MatButtonModule, MatIconModule, ReactiveFormsModule, TextFieldModule, MatFormFieldModule, MatInputModule],
+  imports: [MatExpansionModule, LocationEditingComponent, MatButtonModule, MatIconModule, ReactiveFormsModule, TextFieldModule, MatFormFieldModule, MatInputModule, MatSelectModule],
   template: `
 <!-- I orginally had the entire expansion pannel in the @if and @else, but that was causing issues, ChatGPT suggested only putting the form parts in @if and @else
 <!-- The form for editing the location -->
@@ -53,6 +54,15 @@ interface editForm {
           <mat-form-field>
             <mat-label>End Date</mat-label>
             <input type="text" formControlName="endDate" placeholder="End Date" matInput> <!-- CONNECT SERVICE HERE --> 
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Icon</mat-label>
+            <mat-select formControlName="icon">
+              @for (option of PinOptions; track $index){
+                <mat-option value="{{option[0]}}">{{option[1]}} <mat-icon fontIcon="{{option[0]}}"></mat-icon></mat-option>
+              }
+            </mat-select>
           </mat-form-field>
 
           <!-- Change to textarea to allow box to show all of the description -->
@@ -129,6 +139,7 @@ export class LocationDetailComponent {
       startDate: new FormControl('1', [Validators.pattern('[0-9]+')]),
       endDate: new FormControl('1000', Validators.pattern('[0-9]+')),
       description: new FormControl(''),
+      icon: new FormControl(''),
     },
 
     //{ validators: this.createContactMethodValidator() }
@@ -146,7 +157,7 @@ export class LocationDetailComponent {
         startDate: this.data().startTime?.toString(),
         endDate: this.data().endTime?.toString(),
         description: this.data().description,
-        
+        icon: this.data().icon,
       });
   }
 
@@ -162,6 +173,7 @@ export class LocationDetailComponent {
       startTime: Number.parseFloat(this.editingForm.value.startDate || "0"), 
       endTime: Number.parseFloat(this.editingForm.value.endDate || "0"), 
       description: this.editingForm.value.description!, 
+      icon: this.editingForm.value.icon!,
       id: this.data().id})
   }
 
@@ -169,4 +181,50 @@ export class LocationDetailComponent {
     this.editing = false;
     this.service.deletePin(this.data().id);
   }
+
+  // Available icons from mat design
+  // Ones that aren't working are commented out
+  public PinOptions: Array<Array<string>> = [
+  // Locators
+  ['location_on', 'Location'],
+  ['flag', 'Flag'],
+  ['location_searching', 'Area'],
+
+  // Nature
+  ['eco', 'Nature'],
+  // ['mountain-flag', 'High Point'],
+  ['volcano', 'Volcano'],
+  ['landslide', 'Slope'],
+  ['landscape', 'Mountains'],
+  ['water', 'Water'],
+  ['forest', 'Forest'],
+  ['grass', 'Grassland'],
+  ['diamond', 'Gem'],
+
+  // Buildings:
+  ['castle', 'Castle'],
+  ['fort', 'Fortified Castle'],
+  // ['thingsToDo', 'Dome'],
+  ['houseboat', 'Houseboat'],
+  ['cottage', 'Cottage'],
+  ['stadium', 'Stadium'],
+  ['factory', 'Factory'],
+  // ['camping', 'Tent'],
+  ['church', 'Church'],
+  ['mosque', 'Mosque'],
+  ['synagogue', 'Synagogue'],
+  ['location_city', 'City'],
+
+  // People:
+  ['person', 'Person'],
+  // ['family-group', 'Living Quarters'],
+
+  // Symbols:
+  ['anchor', 'Anchor'],
+  ['bolt', 'Power'],
+  ['cloud', 'Cloud'],
+  // ['sailboat', 'Sailboat'],
+  // ['swords', 'Battle'],
+]
+
 }
