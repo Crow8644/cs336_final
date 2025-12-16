@@ -44,15 +44,17 @@ interface editForm {
             <input type="text" formControlName="locationName" placeholder="Location Name" matInput> <!-- CONNECT SERVICE HERE --> 
           </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>Start Date</mat-label>
-            <input type="text" formControlName="startDate" placeholder="Start Date" matInput> <!-- CONNECT SERVICE HERE -->
-          </mat-form-field>
+          <div id="date-container">
+            <mat-form-field id="start-date-container">
+              <mat-label>Start Date</mat-label>
+              <input type="text" formControlName="startDate" placeholder="Start Date" matInput> <!-- CONNECT SERVICE HERE -->
+            </mat-form-field>
 
-          <mat-form-field>
-            <mat-label>End Date</mat-label>
-            <input type="text" formControlName="endDate" placeholder="End Date" matInput> <!-- CONNECT SERVICE HERE --> 
-          </mat-form-field>
+            <mat-form-field>
+              <mat-label>End Date</mat-label>
+              <input type="text" formControlName="endDate" placeholder="End Date" matInput> <!-- CONNECT SERVICE HERE --> 
+            </mat-form-field>
+          </div>
 
           <mat-form-field>
             <mat-label>Icon</mat-label>
@@ -113,6 +115,12 @@ interface editForm {
     margin-left: 12rem;
     color: red;
   }
+    #date-container {
+      display: flex;
+    }
+    #start-date-container {
+      padding-right: 2rem;
+    }
 
   
   `
