@@ -126,8 +126,8 @@ export class LocationDetailComponent {
   editingForm = new FormGroup(
     {
       locationName: new FormControl('', Validators.required), //'', Validators.required
-      startDate: new FormControl(1, [Validators.pattern('[0-9]+')]),
-      endDate: new FormControl(1000, Validators.pattern('[0-9]+')),
+      startDate: new FormControl('1', [Validators.pattern('[0-9]+')]),
+      endDate: new FormControl('1000', Validators.pattern('[0-9]+')),
       description: new FormControl(''),
     },
 
@@ -143,8 +143,8 @@ export class LocationDetailComponent {
     if (this.editing) {
       this.editingForm.patchValue({
         locationName: this.data().name,
-        startDate: this.data().startTime,
-        endDate: this.data().endTime,
+        startDate: this.data().startTime?.toString(),
+        endDate: this.data().endTime?.toString(),
         description: this.data().description,
         
       });
@@ -156,7 +156,13 @@ export class LocationDetailComponent {
     this.submitted = true;
     this.editing = false;
     // I did a bad thing and added "!" to bypass undefined posibility, if time will fix
-    this.service.updatePin({name: this.editingForm.value.locationName!, startTime: this.editingForm.value.startDate, endTime: this.editingForm.value.endDate, description: this.editingForm.value.description!, id: this.data().id})
+    this.service.updatePin({
+      
+      name: this.editingForm.value.locationName!, 
+      startTime: Number.parseFloat(this.editingForm.value.startDate || "0"), 
+      endTime: Number.parseFloat(this.editingForm.value.endDate || "0"), 
+      description: this.editingForm.value.description!, 
+      id: this.data().id})
   }
 
   deleteLocation() {

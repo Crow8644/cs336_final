@@ -121,6 +121,9 @@ export class PinsService {
     const doc_ref = doc(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins/' + encodeURIComponent(pin.id ?? "")));
     delete pin.id; // A built-in js feature to remove a field from an object
 
+    console.log(typeof pin.endTime);
+    console.log(pin.name);
+
     await updateDoc(doc_ref, pin);
   }
 
