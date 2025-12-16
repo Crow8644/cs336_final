@@ -11,8 +11,8 @@ const default_icon = "Flag";
 export interface Pin {
   id: string,
   // Even in a real pin, these can be undefined, meaning there was no start or no end time
-  startTime?: number,
-  endTime?: number,
+  startTime?: number | null,
+  endTime?: number | null,
   x: number,
   y: number,
   icon: string,
@@ -125,7 +125,7 @@ export class PinsService {
   }
 
   public deletePin(pinID: string) {
-    const collection_ref = collection(this.firestore, ('mapping-application' + encodeURIComponent(this.current_map_name) + 'pins'));
+    const collection_ref = collection(this.firestore, ('mapping-application/' + encodeURIComponent(this.current_map_name) + '/pins'));
 
     const pin_ref = doc(collection_ref, pinID); // Selector for the specific pin with that the passed id
 
